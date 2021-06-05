@@ -18,11 +18,14 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.7.0 <3.0.0"
+  sdk: ">=2.13.0 <3.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
+
+  flutter_riverpod: ^0.14.0+3
+  freezed_annotation:
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -32,6 +35,14 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
+  # Freezedがコード生成するのに必要
+  # コード生成するだけでランタイムに動かないのでdev_dependenciesでおｋ
+  build_runner:
+  freezed:
+
+  # FreezedにfromJson/toJson を生成させたいので追加
+  json_serializable:
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
