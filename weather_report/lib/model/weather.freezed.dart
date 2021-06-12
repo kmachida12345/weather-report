@@ -12,21 +12,27 @@ T _$identity<T>(T value) => value;
 final _privateConstructorUsedError = UnsupportedError(
     'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more informations: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
 
+Weather _$WeatherFromJson(Map<String, dynamic> json) {
+  return _Weather.fromJson(json);
+}
+
 /// @nodoc
 class _$WeatherTearOff {
   const _$WeatherTearOff();
 
   _Weather call(
-      {required int name,
-      required String main,
+      {required String main,
       required String description,
       required String icon}) {
     return _Weather(
-      name: name,
       main: main,
       description: description,
       icon: icon,
     );
+  }
+
+  Weather fromJson(Map<String, Object> json) {
+    return Weather.fromJson(json);
   }
 }
 
@@ -35,11 +41,11 @@ const $Weather = _$WeatherTearOff();
 
 /// @nodoc
 mixin _$Weather {
-  int get name => throw _privateConstructorUsedError;
   String get main => throw _privateConstructorUsedError;
   String get description => throw _privateConstructorUsedError;
   String get icon => throw _privateConstructorUsedError;
 
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
   $WeatherCopyWith<Weather> get copyWith => throw _privateConstructorUsedError;
 }
@@ -48,7 +54,7 @@ mixin _$Weather {
 abstract class $WeatherCopyWith<$Res> {
   factory $WeatherCopyWith(Weather value, $Res Function(Weather) then) =
       _$WeatherCopyWithImpl<$Res>;
-  $Res call({int name, String main, String description, String icon});
+  $Res call({String main, String description, String icon});
 }
 
 /// @nodoc
@@ -61,16 +67,11 @@ class _$WeatherCopyWithImpl<$Res> implements $WeatherCopyWith<$Res> {
 
   @override
   $Res call({
-    Object? name = freezed,
     Object? main = freezed,
     Object? description = freezed,
     Object? icon = freezed,
   }) {
     return _then(_value.copyWith(
-      name: name == freezed
-          ? _value.name
-          : name // ignore: cast_nullable_to_non_nullable
-              as int,
       main: main == freezed
           ? _value.main
           : main // ignore: cast_nullable_to_non_nullable
@@ -92,7 +93,7 @@ abstract class _$WeatherCopyWith<$Res> implements $WeatherCopyWith<$Res> {
   factory _$WeatherCopyWith(_Weather value, $Res Function(_Weather) then) =
       __$WeatherCopyWithImpl<$Res>;
   @override
-  $Res call({int name, String main, String description, String icon});
+  $Res call({String main, String description, String icon});
 }
 
 /// @nodoc
@@ -106,16 +107,11 @@ class __$WeatherCopyWithImpl<$Res> extends _$WeatherCopyWithImpl<$Res>
 
   @override
   $Res call({
-    Object? name = freezed,
     Object? main = freezed,
     Object? description = freezed,
     Object? icon = freezed,
   }) {
     return _then(_Weather(
-      name: name == freezed
-          ? _value.name
-          : name // ignore: cast_nullable_to_non_nullable
-              as int,
       main: main == freezed
           ? _value.main
           : main // ignore: cast_nullable_to_non_nullable
@@ -133,16 +129,14 @@ class __$WeatherCopyWithImpl<$Res> extends _$WeatherCopyWithImpl<$Res>
 }
 
 /// @nodoc
-
+@JsonSerializable()
 class _$_Weather with DiagnosticableTreeMixin implements _Weather {
   const _$_Weather(
-      {required this.name,
-      required this.main,
-      required this.description,
-      required this.icon});
+      {required this.main, required this.description, required this.icon});
 
-  @override
-  final int name;
+  factory _$_Weather.fromJson(Map<String, dynamic> json) =>
+      _$_$_WeatherFromJson(json);
+
   @override
   final String main;
   @override
@@ -152,7 +146,7 @@ class _$_Weather with DiagnosticableTreeMixin implements _Weather {
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'Weather(name: $name, main: $main, description: $description, icon: $icon)';
+    return 'Weather(main: $main, description: $description, icon: $icon)';
   }
 
   @override
@@ -160,7 +154,6 @@ class _$_Weather with DiagnosticableTreeMixin implements _Weather {
     super.debugFillProperties(properties);
     properties
       ..add(DiagnosticsProperty('type', 'Weather'))
-      ..add(DiagnosticsProperty('name', name))
       ..add(DiagnosticsProperty('main', main))
       ..add(DiagnosticsProperty('description', description))
       ..add(DiagnosticsProperty('icon', icon));
@@ -170,8 +163,6 @@ class _$_Weather with DiagnosticableTreeMixin implements _Weather {
   bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other is _Weather &&
-            (identical(other.name, name) ||
-                const DeepCollectionEquality().equals(other.name, name)) &&
             (identical(other.main, main) ||
                 const DeepCollectionEquality().equals(other.main, main)) &&
             (identical(other.description, description) ||
@@ -184,7 +175,6 @@ class _$_Weather with DiagnosticableTreeMixin implements _Weather {
   @override
   int get hashCode =>
       runtimeType.hashCode ^
-      const DeepCollectionEquality().hash(name) ^
       const DeepCollectionEquality().hash(main) ^
       const DeepCollectionEquality().hash(description) ^
       const DeepCollectionEquality().hash(icon);
@@ -193,17 +183,21 @@ class _$_Weather with DiagnosticableTreeMixin implements _Weather {
   @override
   _$WeatherCopyWith<_Weather> get copyWith =>
       __$WeatherCopyWithImpl<_Weather>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$_$_WeatherToJson(this);
+  }
 }
 
 abstract class _Weather implements Weather {
   const factory _Weather(
-      {required int name,
-      required String main,
+      {required String main,
       required String description,
       required String icon}) = _$_Weather;
 
-  @override
-  int get name => throw _privateConstructorUsedError;
+  factory _Weather.fromJson(Map<String, dynamic> json) = _$_Weather.fromJson;
+
   @override
   String get main => throw _privateConstructorUsedError;
   @override
