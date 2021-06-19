@@ -15,56 +15,49 @@ void main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    print('hoge apikey=${Constants.weatherApiKey}');
+    context.read(_weatherInfoStateProvider.notifier).fetchCurrentWeatherInfo();
+
     return MaterialApp(
       home: Scaffold(
         body: SafeArea(
-          child: FutureBuilder(
-            future: fetchAlbum(),
-            builder: (context, snapshot) {
+          child: Consumer (
+            builder: (context, watch, child) {
+              if (watch(_weatherInfoStateProvider) == null) {
+                return Center(
+                  child: CircularProgressIndicator(),
+                );
+              } else {
 
-              if (!snapshot.hasData || snapshot.hasError) {
-                return Center(child: CircularProgressIndicator(),);
-              }
-
-              Map<String, dynamic> weatherMap = json.decode((snapshot.data as http.Response).body)["weather"][0];
-
-              Weather weather = Weather.fromJson(weatherMap);
-
-              print('hoge value=${weather.main}');
-
-              return Container(
-                child: ListView(
+                return ListView(
                   padding: EdgeInsets.all(24),
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          children: [
-                            Text('日付'),
-                            Text('最高最低気温'),
-                            Text('気温'),
-                          ],
-                        ),
-                        Image.network('http://openweathermap.org/img/w/${weather.icon}.png')
-                      ],
-                    )
+                    Image.network('http://openweathermap.org/img/w/${watch(_weatherInfoStateProvider)!.weather[0].icon}.png'),
+                    ListTile(
+                      title: Text('時間：${watch(_weatherInfoStateProvider)!.dt.toString()}'),
+                    ),
+                    Divider(),
+                    ListTile(
+                      title: Text('最高気温：${watch(_weatherInfoStateProvider)!.main.temp_max.toString()}'),
+                    ),
+                    Divider(),
+                    ListTile(
+                      title: Text('いまの気温：${watch(_weatherInfoStateProvider)!.main.temp.toString()}'),
+                    ),
+                    Divider(),
+                    ListTile(
+                      title: Text('湿度：${watch(_weatherInfoStateProvider)!.main.humidity.toString()}'),
+                    ),
+                    Divider(),
+                    ListTile(
+                      title: Text('最低気温：${watch(_weatherInfoStateProvider)!.main.temp_min.toString()}'),
+                    ),
+                    Divider(),
+                    ListTile(
+                      title: Text('体感気温：${watch(_weatherInfoStateProvider)!.main.feels_like.toString()}'),
+                    ),
                   ],
-                ),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      const Color(0xFF3366FF),
-                      const Color(0xFF00CCFF),
-                    ],
-                    begin: const FractionalOffset(0.0, 0.0),
-                    end: const FractionalOffset(1.0, 0.0),
-                    stops: [0.0, 1.0],
-                    tileMode: TileMode.clamp,
-                  ),
-                ),
-              );
+                );
+              }
             },
           ),
         ),
@@ -74,17 +67,19 @@ class MyApp extends StatelessWidget {
   }
 }
 
-Future<http.Response> fetchAlbum() {
-  var future = http.get(Uri.parse(
-      'http://api.openweathermap.org/data/2.5/weather?q=tokyo&appid=${Constants.weatherApiKey}'));
-  future.then((value) {
-    // jsonをパース
-    // とりあえず今の天気は配列の1番目だけとればおｋ
-    Map<String, dynamic> weatherMap = json.decode(value.body)["weather"][0];
+final _weatherInfoStateProvider = StateNotifierProvider.autoDispose<WeatherInfoStateNotifier, WeatherInfo?>((ref) => WeatherInfoStateNotifier());
 
-    Weather weather = Weather.fromJson(weatherMap);
+class WeatherInfoStateNotifier extends StateNotifier<WeatherInfo?> {
+  // HACK: Freezedのメンバのクラスの初期値は設定できないとのこと https://github.com/rrousselGit/freezed/issues/149
+  WeatherInfoStateNotifier() : super(null);
 
-    print('hoge value=${weather.main}');
-  });
-  return future;
+  void fetchCurrentWeatherInfo() {
+    var future = http.get(Uri.parse(
+        'http://api.openweathermap.org/data/2.5/weather?q=tokyo&appid=${Constants.weatherApiKey}'));
+    future.then((value) {
+      WeatherInfo info = WeatherInfo.fromJson(json.decode(value.body));
+      print('hoge value=${info.main}');
+      state = info;
+    });
+  }
 }
