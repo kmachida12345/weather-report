@@ -75,7 +75,7 @@ class WeatherInfoStateNotifier extends StateNotifier<WeatherInfo?> {
 
   void fetchCurrentWeatherInfo() {
     var future = http.get(Uri.parse(
-        'http://api.openweathermap.org/data/2.5/weather?q=tokyo&appid=${Constants.weatherApiKey}'));
+        'http://api.openweathermap.org/data/2.5/weather?q=tokyo&appid=${Constants.weatherApiKey}&units=metric'));
     future.then((value) {
       WeatherInfo info = WeatherInfo.fromJson(json.decode(value.body));
       print('hoge value=${info.main}');
