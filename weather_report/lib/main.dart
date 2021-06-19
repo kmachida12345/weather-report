@@ -33,7 +33,7 @@ class MyApp extends StatelessWidget {
                   children: [
                     Image.network('http://openweathermap.org/img/w/${watch(_weatherInfoStateProvider)!.weather[0].icon}.png'),
                     ListTile(
-                      title: Text('時間：${watch(_weatherInfoStateProvider)!.dt.toString()}'),
+                      title: Text('時間：${DateTime.fromMillisecondsSinceEpoch(watch(_weatherInfoStateProvider)!.dt * 1000).toLocal()}'),
                     ),
                     Divider(),
                     ListTile(
