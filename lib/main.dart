@@ -3,8 +3,10 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
-import 'package:weather_report/model/weather.dart';
+import 'package:weather_report/model/current_weather.dart';
 import 'package:weather_report/util/constants.dart';
+
+import 'model/forecast.dart';
 
 void main() {
   runApp(ProviderScope(
@@ -16,44 +18,51 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     context.read(_weatherInfoStateProvider.notifier).fetchCurrentWeatherInfo();
+    context.read(_weatherInfoStateProvider.notifier).fetchWeatherForecast();
 
     return MaterialApp(
       home: Scaffold(
         body: SafeArea(
-          child: Consumer (
+          child: Consumer(
             builder: (context, watch, child) {
               if (watch(_weatherInfoStateProvider) == null) {
                 return Center(
                   child: CircularProgressIndicator(),
                 );
               } else {
-
                 return ListView(
                   padding: EdgeInsets.all(24),
                   children: [
-                    Image.network('http://openweathermap.org/img/w/${watch(_weatherInfoStateProvider)!.weather[0].icon}.png'),
+                    Image.network(
+                        'http://openweathermap.org/img/w/${watch(_weatherInfoStateProvider)!.weather[0].icon}.png'),
                     ListTile(
-                      title: Text('時間：${DateTime.fromMillisecondsSinceEpoch(watch(_weatherInfoStateProvider)!.dt * 1000).toLocal()}'),
+                      title: Text(
+                          '時間：${DateTime.fromMillisecondsSinceEpoch(watch(_weatherInfoStateProvider)!.dt * 1000).toLocal()}'),
                     ),
                     Divider(),
                     ListTile(
-                      title: Text('最高気温：${watch(_weatherInfoStateProvider)!.main.temp_max.toString()}'),
+                      title: Text(
+                          '最高気温：${watch(_weatherInfoStateProvider)!.main.temp_max.toString()}'),
                     ),
                     Divider(),
                     ListTile(
-                      title: Text('いまの気温：${watch(_weatherInfoStateProvider)!.main.temp.toString()}'),
+                      title: Text(
+                          'いまの気温：${watch(_weatherInfoStateProvider)!.main.temp.toString()}'),
                     ),
                     Divider(),
                     ListTile(
-                      title: Text('湿度：${watch(_weatherInfoStateProvider)!.main.humidity.toString()}'),
+                      title: Text(
+                          '湿度：${watch(_weatherInfoStateProvider)!.main.humidity.toString()}'),
                     ),
                     Divider(),
                     ListTile(
-                      title: Text('最低気温：${watch(_weatherInfoStateProvider)!.main.temp_min.toString()}'),
+                      title: Text(
+                          '最低気温：${watch(_weatherInfoStateProvider)!.main.temp_min.toString()}'),
                     ),
                     Divider(),
                     ListTile(
-                      title: Text('体感気温：${watch(_weatherInfoStateProvider)!.main.feels_like.toString()}'),
+                      title: Text(
+                          '体感気温：${watch(_weatherInfoStateProvider)!.main.feels_like.toString()}'),
                     ),
                   ],
                 );
@@ -67,7 +76,9 @@ class MyApp extends StatelessWidget {
   }
 }
 
-final _weatherInfoStateProvider = StateNotifierProvider.autoDispose<WeatherInfoStateNotifier, WeatherInfo?>((ref) => WeatherInfoStateNotifier());
+final _weatherInfoStateProvider =
+    StateNotifierProvider.autoDispose<WeatherInfoStateNotifier, WeatherInfo?>(
+        (ref) => WeatherInfoStateNotifier());
 
 class WeatherInfoStateNotifier extends StateNotifier<WeatherInfo?> {
   // HACK: Freezedのメンバのクラスの初期値は設定できないとのこと https://github.com/rrousselGit/freezed/issues/149
@@ -80,6 +91,15 @@ class WeatherInfoStateNotifier extends StateNotifier<WeatherInfo?> {
       WeatherInfo info = WeatherInfo.fromJson(json.decode(value.body));
       print('hoge value=${info.main}');
       state = info;
+    });
+  }
+
+  void fetchWeatherForecast() {
+    var future = http.get(Uri.parse(
+        'https://api.openweathermap.org/data/2.5/onecall?lat=35.658034&lon=139.701636&appid=${Constants.weatherApiKey}&units=metric'));
+    future.then((value) {
+      Forecast info = Forecast.fromJson(json.decode(value.body));
+      print('fuga value=${info.toString()}');
     });
   }
 }
